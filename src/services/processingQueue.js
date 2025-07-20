@@ -109,9 +109,10 @@ export class ProcessingQueue {
         await this.dataLogger.logExtractedContent(episodeNumber, extractedContent);
       }
 
-      // Step 4: Upload files to R2
+      // Step 4: Find and upload full episode file (not the -no-mix version)
       item.steps.upload = 'in_progress';
-      const uploadedUrls = await this.storageService.uploadFiles(localPath, extractedContent.episodeNumber);
+      const fullEpisodePath = await this.findFullEpisodeFile(item.file, extractedContent.episodeNumber);
+      const uploadedUrls = await this.storageService.uploadFiles(fullEpisodePath, extractedContent.episodeNumber);
       item.steps.upload = 'completed';
       logger.info('Files uploaded to R2');
       
@@ -150,6 +151,45 @@ export class ProcessingQueue {
       if (episodeNumber) {
         await this.dataLogger.finalizeEpisode(episodeNumber, 'failed', error.message);
       }
+    }
+  }
+
+  async findFullEpisodeFile(transcriptFile) {
+    try {
+      // Look for the full episode file (without -no-mix suffix)
+      const baseFilename = transcriptFile.name.replace('-no-mix', '');
+      
+      logger.debug(`Looking for full episode file: ${baseFilename}`);
+      
+      // Search for the full episode file in Google Drive
+      const response = await this.driveWatcher.drive.files.list({
+        q: `'${process.env.GOOGLE_DRIVE_FOLDER_ID}' in parents and name='${baseFilename}' and trashed=false`,
+        fields: 'files(id,name,size,mimeType)'
+      });
+      
+      const fullEpisodeFile = response.data.files?.[0];
+      
+      if (fullEpisodeFile) {
+        logger.info(`Found full episode file: ${fullEpisodeFile.name}`);
+        // Download the full episode file
+        const tempDir = './temp';
+        const fs = await import('fs-extra');
+        await fs.ensureDir(tempDir);
+        
+        const fullEpisodePath = `${tempDir}/castsmith-${fullEpisodeFile.id}-${fullEpisodeFile.name}`;
+        await this.driveWatcher.downloadFile(fullEpisodeFile.id, fullEpisodePath);
+        
+        return fullEpisodePath;
+      } else {
+        logger.warn(`Full episode file not found for ${baseFilename}, using transcript file as fallback`);
+        // Fallback to transcript file if full episode not found
+        return await this.downloadFile(transcriptFile);
+      }
+      
+    } catch (error) {
+      logger.error(`Error finding full episode file:`, error);
+      logger.warn(`Using transcript file as fallback`);
+      return await this.downloadFile(transcriptFile);
     }
   }
 

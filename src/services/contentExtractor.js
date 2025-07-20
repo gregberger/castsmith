@@ -47,37 +47,45 @@ TRANSCRIPTION:
 ${transcriptText}
 
 INSTRUCTIONS:
-1. Identifie tous les morceaux de musique mentionnés avec:
-   - Titre du morceau
+Analyse cette transcription et extrais le contenu pour créer un épisode de podcast structuré. 
+
+1. TITRE DE L'ÉPISODE: Crée un titre accrocheur (SANS ":" car cela casse le YAML)
+
+2. MONOLOGUE D'OUVERTURE DE JEROHM: Extrais le texte du début jusqu'à "Bienvenue dans l'émission cosmic" ou "numéro x de radio cosmic" ou "bonjour à tous" (tout ce qui marque le début officiel de l'émission)
+
+3. MORCEAUX MENTIONNÉS: Pour chaque track, inclus:
    - Artiste
-   - Label (si mentionné)
-   - Année (si mentionnée)
+   - Titre du morceau
+   - Année/Label si mentionné  
    - Genre musical
-   - Liens vers plateformes (Spotify, Bandcamp, etc. si mentionnés)
+   - Lien YouTube/SoundCloud FONCTIONNEL (obligatoire - cherche le vrai titre sur ces plateformes)
 
-2. Note les festivals, événements ou lieux mentionnés
+4. ÉVÉNEMENTS/FESTIVALS mentionnés avec lieux
 
-3. Identifie les invités et leurs projets/collectifs
+5. INVITÉS/DJS mentionnés avec leurs liens
 
-4. Résume les sujets principaux abordés
+6. DESCRIPTION de l'épisode (2-3 phrases sur le contenu musical)
 
-5. Crée un titre d'épisode accrocheur en français
-
-6. Écris une description de l'épisode (2-3 phrases)
+IMPORTANT pour les liens:
+- Trouve les VRAIS liens YouTube qui fonctionnent
+- Format: https://www.youtube.com/watch?v=VIDEO_ID  
+- Si incertain, écris "Lien à vérifier"
+- Privilégie les liens officiels des artistes
 
 RÉPONDS EN JSON STRICTEMENT DANS CE FORMAT:
 \`\`\`json
 {
-  "title": "Titre de l'épisode",
+  "title": "Titre de l'épisode (sans deux-points)",
   "description": "Description de l'épisode en 2-3 phrases",
+  "openingMonologue": "Texte du monologue d'ouverture de Jerohm",
   "tracks": [
     {
       "title": "Nom du morceau",
-      "artist": "Nom de l'artiste",
-      "label": "Nom du label",
-      "year": "2024",
-      "genre": "House/Techno/etc",
-      "links": ["url1", "url2"]
+      "artist": "Nom de l'artiste", 
+      "label": "Nom du label ou null",
+      "year": "2024 ou null",
+      "genre": "Genre musical",
+      "youtubeLink": "https://www.youtube.com/watch?v=VIDEO_ID ou null"
     }
   ],
   "events": [
@@ -90,11 +98,10 @@ RÉPONDS EN JSON STRICTEMENT DANS CE FORMAT:
   "guests": [
     {
       "name": "Nom de l'invité",
-      "project": "Nom du projet/collectif"
+      "project": "Nom du projet/collectif",
+      "links": ["url1", "url2"]
     }
-  ],
-  "topics": ["sujet1", "sujet2", "sujet3"],
-  "duration": "${this.formatDuration(Math.floor(transcriptText.length / 20))}"
+  ]
 }
 \`\`\`
 
@@ -145,10 +152,10 @@ IMPORTANT:
     });
 
     let markdown = `---
-title: ${content.title}
-audioUrl: "TO_BE_REPLACED_WITH_R2_URL"
-pubDate: ${pubDate}
-duration: ${content.duration}
+title: "${content.title}"
+audioUrl: "TO_BE_REPLACED_WITH_R2_URL"  
+pubDate: "${pubDate}"
+duration: "${content.duration || '0:00:00'}"
 size: TO_BE_CALCULATED
 cover: "/images/ep${content.episodeNumber}.png"
 explicit: true
@@ -159,9 +166,24 @@ episodeType: full
 
 # ${content.title}
 
-${content.description}
+Animé par [Jerohm](https://jerohm.com/) avec la complicité de [Antoine aka Cosmic Turtle](https://i.seadn.io/gcs/files/a552993aecdcdb0aedd93116bc207e59.png?auto=format&w=1400&fr=1), [Greg aka Joe d'Absynth](https://soundcloud.com/gregory-berger-1) et [Kevin aka George Mood](https://soundcloud.com/george_mood)
 
-Animé par [Jerohm](https://jerohm.com/) avec la complicité de [Cosmic Turtle](https://i.seadn.io/gcs/files/a552993aecdcdb0aedd93116bc207e59.png?auto=format&w=1400&fr=1), [George Mood](https://soundcloud.com/george_mood) et [Joe d'Absynth](https://soundcloud.com/gregory-berger-1)
+---
+
+`;
+
+    // Add opening monologue if available
+    if (content.openingMonologue) {
+      markdown += `## Le monologue de Jérôme
+
+> ${content.openingMonologue.replace(/\n/g, '  \n> ')}
+
+---
+
+`;
+    }
+
+    markdown += `${content.description}
 
 `;
 
@@ -175,14 +197,17 @@ Animé par [Jerohm](https://jerohm.com/) avec la complicité de [Cosmic Turtle](
 
     // Add tracklist if tracks found
     if (content.tracks && content.tracks.length > 0) {
-      markdown += `## Morceaux mentionnés\n\n`;
+      markdown += `## Morceaux mentionnés
+
+| Artiste | Morceau | Info | Lien YouTube |
+|---------|---------|------|--------------|
+`;
       content.tracks.forEach(track => {
-        markdown += `- **${track.artist}** - ${track.title}`;
-        if (track.label) markdown += ` (${track.label})`;
-        if (track.year) markdown += ` - ${track.year}`;
-        markdown += `\n`;
+        const info = [track.label, track.year].filter(Boolean).join(' - ') || 'Original';
+        const link = track.youtubeLink ? `[écouter](${track.youtubeLink})` : 'Lien à vérifier';
+        markdown += `| ${track.artist} | ${track.title} | ${info} | ${link} |\n`;
       });
-      markdown += `\n`;
+      markdown += `\n---\n\n`;
     }
 
     // Add events if mentioned
