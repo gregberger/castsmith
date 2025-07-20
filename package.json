@@ -1,0 +1,31 @@
+{
+  "name": "castsmith",
+  "version": "1.0.0",
+  "description": "Automated podcast workflow from Google Drive to published episodes",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["podcast", "automation", "transcription", "ai", "workflow"],
+  "author": "Cosmic Collective",
+  "license": "MIT",
+  "dependencies": {
+    "googleapis": "^142.0.0",
+    "@anthropic-ai/sdk": "^0.27.3",
+    "assemblyai": "^4.7.1",
+    "@aws-sdk/client-s3": "^3.665.0",
+    "simple-git": "^3.25.0",
+    "node-cron": "^3.0.3",
+    "winston": "^3.14.0",
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "axios": "^1.7.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

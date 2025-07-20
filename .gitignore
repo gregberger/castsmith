@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+.pnpm-store/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime
+.pid
+.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Temporary folders
+.tmp/
+temp/
+tmp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build outputs
+dist/
+build/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Audio files (temporary downloads)
+*.mp3
+*.flac
+*.wav
+*.m4a
+downloads/
+
+# Local development
+dev-data/
+test-uploads/
+
+debug-tools/
+generated/*
+
+# keep .gitkeep files
+!.gitkeep
