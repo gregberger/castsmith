@@ -24,12 +24,13 @@ export class StorageService {
       
       const results = {};
       
-      // Upload main audio file
-      const audioKey = `Cosmic-${episodeNumber.toString().padStart(2, '0')}.mp3`;
+      // Upload main audio file (without -no-mix suffix)
+      const podcastName = process.env.PODCAST_NAME || 'podcast';
+      const audioKey = `${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${episodeNumber.toString().padStart(2, '0')}.mp3`;
       results.audioUrl = await this.uploadFile(audioFilePath, audioKey);
       
       // TODO: If we have FLAC version, upload that too
-      // const flacKey = `Cosmic-${episodeNumber.toString().padStart(2, '0')}.flac`;
+      // const flacKey = `${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${episodeNumber.toString().padStart(2, '0')}.flac`;
       // results.flacUrl = await this.uploadFile(flacFilePath, flacKey);
       
       logger.info('File upload completed');
@@ -135,24 +136,27 @@ export class StorageService {
 
   // Generate the episode URL format expected by Astropod
   generateEpisodeUrl(episodeNumber) {
+    const podcastName = process.env.PODCAST_NAME || 'podcast';
     const paddedNumber = episodeNumber.toString().padStart(2, '0');
-    return `${this.publicUrl}/Cosmic-${paddedNumber}.mp3`;
+    return `${this.publicUrl}/${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${paddedNumber}.mp3`;
   }
 
   // Check if episode already exists (to avoid re-uploading)
   async episodeExists(episodeNumber) {
-    const key = `Cosmic-${episodeNumber.toString().padStart(2, '0')}.mp3`;
+    const podcastName = process.env.PODCAST_NAME || 'podcast';
+    const key = `${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${episodeNumber.toString().padStart(2, '0')}.mp3`;
     return await this.fileExists(key);
   }
 
   // Batch upload multiple formats
   async uploadMultipleFormats(files, episodeNumber) {
     const results = {};
+    const podcastName = process.env.PODCAST_NAME || 'podcast';
     const paddedNumber = episodeNumber.toString().padStart(2, '0');
     
     for (const [format, filePath] of Object.entries(files)) {
       if (filePath && await fs.pathExists(filePath)) {
-        const key = `Cosmic-${paddedNumber}.${format}`;
+        const key = `${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${paddedNumber}.${format}`;
         results[`${format}Url`] = await this.uploadFile(filePath, key);
       }
     }

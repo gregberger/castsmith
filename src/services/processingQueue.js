@@ -69,8 +69,7 @@ export class ProcessingQueue {
       item.status = 'processing';
 
       // Initialize episode data logging
-      const episodeMatch = item.file.name.match(/cosmic-(\d+)/i);
-      episodeNumber = episodeMatch ? parseInt(episodeMatch[1]) : null;
+      episodeNumber = this.driveWatcher.extractEpisodeNumber(item.file.name);
       
       if (episodeNumber) {
         await this.dataLogger.initializeEpisode(episodeNumber, {

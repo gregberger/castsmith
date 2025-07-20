@@ -85,9 +85,18 @@ export class DriveWatcher {
   }
 
   matchesNamingPattern(filename) {
-    // Pattern: cosmic-XX.ext (e.g., cosmic-06.mp3, cosmic-07.flac)
-    const pattern = /^cosmic-\d{2}\.(mp3|flac|wav|m4a)$/i;
+    // Pattern for transcript files: xxx-nn-no-mix.ext (e.g., cosmic-06-no-mix.mp3)
+    const podcastName = process.env.PODCAST_NAME || 'podcast';
+    const pattern = new RegExp(`^${podcastName}-(\\d+)-no-mix\\.(mp3|flac|wav|m4a)$`, 'i');
     return pattern.test(filename);
+  }
+
+  extractEpisodeNumber(filename) {
+    // Extract episode number from transcript filename
+    const podcastName = process.env.PODCAST_NAME || 'podcast';
+    const pattern = new RegExp(`^${podcastName}-(\\d+)-no-mix\\.(mp3|flac|wav|m4a)$`, 'i');
+    const match = filename.match(pattern);
+    return match ? parseInt(match[1]) : null;
   }
 
   async downloadFile(fileId, outputPath) {

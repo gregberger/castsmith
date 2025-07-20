@@ -92,12 +92,18 @@ CastSmith watches your Google Drive for new audio files, automatically transcrib
 
 ### File Naming Convention
 
-CastSmith looks for audio files matching the pattern: `cosmic-XX.ext`
+CastSmith looks for transcript audio files matching the pattern: `{PODCAST_NAME}-{NN}-no-mix.{ext}`
 
-Examples:
-- `cosmic-06.mp3` ✅
-- `cosmic-07.flac` ✅
-- `random-file.mp3` ❌
+The `-no-mix` suffix indicates these are files for transcription (lighter, without guest mixes).
+
+Examples (with `PODCAST_NAME=cosmic`):
+- `cosmic-06-no-mix.mp3` ✅ (transcript file)
+- `cosmic-07-no-mix.flac` ✅ (transcript file)
+- `cosmic-06.mp3` ❌ (missing -no-mix suffix)
+- `random-file.mp3` ❌ (wrong naming pattern)
+
+**Uploaded files** use the pattern `{PodcastName}-{NN}.{ext}` (capitalized, without -no-mix):
+- Upload: `Cosmic-06.mp3` (from transcript file `cosmic-06-no-mix.mp3`)
 
 ### Environment Variables
 
