@@ -20,8 +20,8 @@ export class ContentExtractor {
       const prompt = this.buildExtractionPrompt(transcript.text, episodeNumber);
 
       const response = await this.anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 4000,
+        model: 'claude-4-sonnet-20250514',
+        max_tokens: 8000,
         temperature: 0.1,
         messages: [{
           role: 'user',
@@ -41,7 +41,7 @@ export class ContentExtractor {
     }
   }
 
-  buildExtractionPrompt(transcriptText, episodeNumber) {
+  buildExtractionPrompt(transcriptText, _episodeNumber) {
     return `Tu es un expert en musique électronique et en podcasts. Analyse cette transcription d'un épisode du podcast "Cosmic, L'émission" et extrais les informations suivantes:
 
 TRANSCRIPTION:
@@ -168,6 +168,17 @@ episodeType: full
 # ${content.title}
 
 Animé par [Jerohm](https://jerohm.com/) avec la complicité de [Antoine aka Cosmic Turtle](https://i.seadn.io/gcs/files/a552993aecdcdb0aedd93116bc207e59.png?auto=format&w=1400&fr=1), [Greg aka Joe d'Absynth](https://soundcloud.com/gregory-berger-1) et [Kevin aka George Mood](https://soundcloud.com/george_mood)
+
+
+\`\`\`
+⚠️⚠️⚠️ DISCLAIMER ⚠️⚠️⚠️
+
+La page de cet épisode a été générée automatiquement par une IA (Claude Sonnet 4 de Anthropic), sur base d'un transcript lui-même généré par une IA (AssemblyAI) à partir de l'enregistrement audio
+
+Utiliser de l'intelligence artificielle nous permet de laisser libre cours à notre bêtise naturelle (ceci dit, c'est probablement l'inverse: notre bêtise naturelle nous pousse à utiliser de l'intelligence artificielle). 
+
+Toujours est-il que des erreurs ~~peuvent~~ doivent s'être glissées ici. N'hésitez pas à nous les communiquer si vous en décelez.
+ \`\`\`
 
 ---
 
