@@ -24,13 +24,13 @@ export class StorageService {
       
       const results = {};
       
-      // Upload main audio file (without -no-mix suffix)
+      // Upload main audio file (without -no-mix suffix, not capitalized)
       const podcastName = process.env.PODCAST_NAME || 'podcast';
-      const audioKey = `${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${episodeNumber.toString().padStart(2, '0')}.mp3`;
+      const audioKey = `${podcastName}-${episodeNumber.toString().padStart(2, '0')}.mp3`;
       results.audioUrl = await this.uploadFile(audioFilePath, audioKey);
       
       // TODO: If we have FLAC version, upload that too
-      // const flacKey = `${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${episodeNumber.toString().padStart(2, '0')}.flac`;
+      // const flacKey = `${podcastName}-${episodeNumber.toString().padStart(2, '0')}.flac`;
       // results.flacUrl = await this.uploadFile(flacFilePath, flacKey);
       
       logger.info('File upload completed');
@@ -138,13 +138,13 @@ export class StorageService {
   generateEpisodeUrl(episodeNumber) {
     const podcastName = process.env.PODCAST_NAME || 'podcast';
     const paddedNumber = episodeNumber.toString().padStart(2, '0');
-    return `${this.publicUrl}/${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${paddedNumber}.mp3`;
+    return `${this.publicUrl}/${podcastName}-${paddedNumber}.mp3`;
   }
 
   // Check if episode already exists (to avoid re-uploading)
   async episodeExists(episodeNumber) {
     const podcastName = process.env.PODCAST_NAME || 'podcast';
-    const key = `${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${episodeNumber.toString().padStart(2, '0')}.mp3`;
+    const key = `${podcastName}-${episodeNumber.toString().padStart(2, '0')}.mp3`;
     return await this.fileExists(key);
   }
 
@@ -156,7 +156,7 @@ export class StorageService {
     
     for (const [format, filePath] of Object.entries(files)) {
       if (filePath && await fs.pathExists(filePath)) {
-        const key = `${podcastName.charAt(0).toUpperCase() + podcastName.slice(1)}-${paddedNumber}.${format}`;
+        const key = `${podcastName}-${paddedNumber}.${format}`;
         results[`${format}Url`] = await this.uploadFile(filePath, key);
       }
     }

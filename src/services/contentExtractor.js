@@ -12,8 +12,9 @@ export class ContentExtractor {
     try {
       logger.info('Starting content extraction from transcript');
 
-      // Extract episode number from filename (cosmic-06.mp3 -> 6)
-      const episodeMatch = filename.match(/cosmic-(\d+)/i);
+      // Extract episode number from filename using podcast name
+      const podcastName = process.env.PODCAST_NAME || 'podcast';
+      const episodeMatch = filename.match(new RegExp(`${podcastName}-(\\d+)`, 'i'));
       const episodeNumber = episodeMatch ? parseInt(episodeMatch[1]) : null;
 
       const prompt = this.buildExtractionPrompt(transcript.text, episodeNumber);
@@ -51,7 +52,7 @@ Analyse cette transcription et extrais le contenu pour créer un épisode de pod
 
 1. TITRE DE L'ÉPISODE: Crée un titre accrocheur (SANS ":" car cela casse le YAML)
 
-2. MONOLOGUE D'OUVERTURE DE JEROHM: Extrais le texte du début jusqu'à "Bienvenue dans l'émission cosmic" ou "numéro x de radio cosmic" ou "bonjour à tous" (tout ce qui marque le début officiel de l'émission)
+2. MONOLOGUE D'OUVERTURE DE JEROHM: Extrais le texte du début jusqu'à "Bienvenue dans l'émission" ou "numéro x de radio" ou "bonjour à tous" (tout ce qui marque le début officiel de l'émission)
 
 3. MORCEAUX MENTIONNÉS: Pour chaque track, inclus:
    - Artiste
